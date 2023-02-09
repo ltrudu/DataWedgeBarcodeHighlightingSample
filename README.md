@@ -1,8 +1,9 @@
 # DataWedgeBarcodeHighlightingSample
 
-*This application is intended for demonstration purposes only. It is provided as-is without guarantee or warranty and may be modified to suit individual needs.*
+*This application is intended for demonstration purposes only.*
 
-See License.md for licensing.
+*It is provided as-is without guarantee or warranty and may be modified to suit individual needs.*
+
 =========================================================
 
 This sample demonstrate how to highlight barcodes using Datawedge API.
@@ -17,3 +18,8 @@ After changing a value, the user has to push the button "Highlight Imager/Camera
 
 The user can revert to regular scanning anytime by hitting the button "Regular Scan".
 
+=========================================================
+
+See License.md for licensing.
+
+=========================================================
