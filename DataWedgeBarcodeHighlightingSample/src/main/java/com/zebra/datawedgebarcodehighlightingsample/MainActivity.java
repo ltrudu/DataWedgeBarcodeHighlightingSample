@@ -7,24 +7,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "FreeformCapture";
+    private static final String TAG = "BarcodeHighlight";
     TextView txtStatus = null;
     private String statusString = "";
     private ScrollView sv_status = null;
@@ -41,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
     EditText et_red     = null;
     EditText et_green   = null;
     EditText et_blue    = null;
+
+    EditText et_contains = null;
+    EditText et_color = null;
+    Spinner spSymbology = null;
+
+    String sSelectedSymbology = null;
 
     /*
         Handler and runnable to scroll down views
@@ -57,8 +59,27 @@ public class MainActivity extends AppCompatActivity {
         et_red = findViewById(R.id.et_red);
         et_green = findViewById(R.id.et_green);
         et_blue = findViewById(R.id.et_blue);
+        et_contains = findViewById(R.id.et_reportcontains);
+        et_color = findViewById(R.id.et_reportcolor);
+        spSymbology = findViewById(R.id.sp_symbology);
+        spSymbology.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+              @Override
+              public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                  sSelectedSymbology = adapterView.getItemAtPosition(i).toString();
+              }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                sSelectedSymbology = "decoder_qrcode";
+            }
+        });
+        sSelectedSymbology = "decoder_qrcode";
+        spSymbology.setSelection(17);
+        fillSpinner();
         registerReceivers();
     }
+
+
 
     @Override
     protected void onResume() {
@@ -82,6 +103,57 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unRegisterReceivers();
+    }
+
+    private void fillSpinner() {
+        ArrayList<String> triggerActionTypeList = new ArrayList<String>(){{
+            //add(Constants.SHARED_PREFERENCES_UNSELECTED);
+            //add("decoder_australian_postal");
+            //add("decoder_aztec");
+            //add("decoder_canadian_postal");
+            //add("decoder_chinese_2of5");
+            add("decoder_codabar");
+            add("decoder_code11");
+            add("decoder_code128");
+            add("decoder_code39");
+            add("decoder_code93");
+            //add("decoder_composite_ab");
+            //add("decoder_composite_c");
+            //add("decoder_d2of5");
+            add("decoder_datamatrix");
+            //add("decoder_dutch_postal");
+            add("decoder_ean13");
+            add("decoder_ean8");
+            add("decoder_gs1_databar");
+            add("decoder_gs1_qrcode");
+            //add("decoder_hanxin");
+            add("decoder_i2of5");
+            //add("decoder_japanese_postal");
+            //add("decoder_korean_3of5");
+            //add("decoder_mailmark");
+            add("decoder_matrix_2of5");
+            add("decoder_maxicode");
+            add("decoder_micropdf");
+            add("decoder_microqr");
+            //add("decoder_msi");
+            add("decoder_pdf417");
+            add("decoder_qrcode");
+            //add("decoder_signature");
+            //add("decoder_tlc39");
+            //add("decoder_trioptic39");
+            //add("decoder_uk_postal");
+            add("decoder_upca");
+            add("decoder_upce0");
+            add("decoder_upce1");
+            //add("decoder_us4state");
+            //add("decoder_usplanet");
+            //add("decoder_uspostnet");
+            //add("decoder_webcode");
+
+        }};
+        ArrayAdapter<String> actionTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, triggerActionTypeList);
+        actionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spSymbology.setAdapter(actionTypeAdapter);
     }
 
     private void queryProfileList(){
@@ -153,6 +225,12 @@ public class MainActivity extends AppCompatActivity {
         switchToRegularScan();
     }
 
+    public void onBarcodeReporting(View view)
+    {
+        switchToBarcodeReporting(true);
+    }
+
+    public void onBarcodeReportingCamera(View view) { switchToBarcodeReporting(false); }
 
     public void onClickScan(View view) {
         Intent i = new Intent();
@@ -235,6 +313,11 @@ public class MainActivity extends AppCompatActivity {
         //Enable barcode highlighting
         paramList.putString("barcode_highlighting_enabled", "true");
 
+        // Create a bundle ignore case for later use (in "contains" criteria)
+        Bundle bundleIgnoreCase = new Bundle();
+        bundleIgnoreCase.putString("criteria_key","ignore_case");
+        bundleIgnoreCase.putString("criteria_value","true");
+
         //Create a barcode highlighting Rule 1 [Start]
         Bundle rule1 = new Bundle();
         rule1.putString("rule_name", "Rule1");
@@ -248,10 +331,13 @@ public class MainActivity extends AppCompatActivity {
         else
             bundleContains1.putString("criteria_value", "http");
 
+
+
         //Container is just one parameter of identifier group.
         // There are other params such as ignore case, min length, max length
         ArrayList<Bundle> identifierParamList = new ArrayList<>();
         identifierParamList.add(bundleContains1);
+        identifierParamList.add(bundleIgnoreCase);
 
         //Add the parameters of "identifier" group as a ParcelableArrayList to criteria list
         rule1Criteria.putParcelableArrayList("identifier", identifierParamList);
@@ -285,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<Bundle> identifierParamList2 = new ArrayList<>();
         identifierParamList2.add(bundleContains2);
+        identifierParamList2.add(bundleIgnoreCase);
 
         rule2Criteria.putParcelableArrayList("identifier", identifierParamList2);
 
@@ -349,6 +436,129 @@ public class MainActivity extends AppCompatActivity {
         sendBroadcast(i);
     }
 
+
+    private void switchToBarcodeReporting(boolean internalImager) {
+        //Specify the DataWedge action and SWITCH_DATACAPTURE API parameters
+        Intent i = new Intent();
+        i.setAction("com.symbol.datawedge.api.ACTION");
+        i.putExtra("APPLICATION_PACKAGE", getPackageName());
+        i.setPackage("com.symbol.datawedge");
+        i.putExtra("SEND_RESULT", "LAST_RESULT");
+        i.putExtra("com.symbol.datawedge.api.SWITCH_DATACAPTURE", "BARCODE");
+
+        String contains = et_contains.getText().toString();
+
+        Bundle paramList = new Bundle();
+        //Specify the scanner to use (Only internal imager and camera are supported currently)
+        if(internalImager)
+        {
+            paramList.putString("scanner_selection_by_identifier", "INTERNAL_IMAGER");
+        }
+        else
+        {
+            paramList.putString("scanner_selection_by_identifier", "INTERNAL_CAMERA");
+        }
+
+        //Enable barcode highlighting
+        paramList.putString("barcode_highlighting_enabled", "true");
+
+        //Create a barcode highlighting Rule 1 [Start]
+        Bundle rule1 = new Bundle();
+        rule1.putString("rule_name", "Rule1");
+        Bundle rule1Criteria = new Bundle();
+
+        //Set the criteria/condition. Specify the contains parameter.
+        Bundle bundleContains1 = new Bundle();
+        bundleContains1.putString("criteria_key", "contains");
+        bundleContains1.putString("criteria_value", contains);
+
+        Bundle rule1BundleIgnoreCase = new Bundle();
+        rule1BundleIgnoreCase.putString("criteria_key","ignore_case");
+        rule1BundleIgnoreCase.putString("criteria_value","false");
+
+        //Container is just one parameter of identifier group.
+        // There are other params such as ignore case, min length, max length
+        ArrayList identifierParamList = new ArrayList<>();
+        identifierParamList.add(rule1BundleIgnoreCase);
+        identifierParamList.add(bundleContains1);
+
+
+        //Add the parameters of "identifier" group as a ParcelableArrayList to criteria list
+        rule1Criteria.putParcelableArrayList("identifier", identifierParamList);
+
+        //Add the criteria to Rule bundle
+        rule1.putBundle("criteria", rule1Criteria);
+
+        //Set up the action bundle by specifying the color to be highlight
+        Bundle bundleFillColor = new Bundle();
+        bundleFillColor.putString("action_key", "fillcolor");
+        bundleFillColor.putString("action_value", "#CEF04E6E");
+
+        ArrayList rule1Actions = new ArrayList<>();
+        rule1Actions.add(bundleFillColor);
+        rule1.putParcelableArrayList("actions", rule1Actions);
+        //Create a barcode highlighting Rule 1 [Finish]
+
+        /**
+         * report data
+         */
+        /*##### Report data for rule Start #####*/
+        Bundle rule2 = new Bundle();
+        rule2.putString("rule_name","Rule2");
+        Bundle rule2Criteria = new Bundle();
+
+        Bundle rule2BundleContains = new Bundle();
+        rule2BundleContains.putString("criteria_key","contains");
+        rule2BundleContains.putString("criteria_value",contains);
+
+        Bundle rule2BundleIgnoreCase = new Bundle();
+        rule2BundleIgnoreCase.putString("criteria_key","ignore_case");
+        rule2BundleIgnoreCase.putString("criteria_value","false");
+
+        ArrayList<Bundle> rule2IdentifierParamList = new ArrayList<>();
+        rule2IdentifierParamList.add(rule2BundleIgnoreCase);
+        rule2IdentifierParamList.add(rule2BundleContains);
+
+        rule2Criteria.putParcelableArrayList("identifier",rule2IdentifierParamList);
+        rule2Criteria.putStringArray("symbology",new String[]{sSelectedSymbology});
+        rule2.putBundle("criteria",rule2Criteria);
+
+        Bundle rule2BundleReport = new Bundle();
+        rule2BundleReport.putString("action_key","report");
+
+        Bundle rule2BundleReportStrokeColor = new Bundle();
+        rule2BundleReportStrokeColor.putString("action_key", "fillcolor");
+        String color = et_color.getText().toString();
+        if(color.isEmpty())
+            color = "#CE00FF00";
+        rule2BundleReportStrokeColor.putString("action_value", color);
+
+        ArrayList<Bundle> rule2Actions = new ArrayList<>();
+        rule2Actions.add(rule2BundleReport);
+        //rule2Actions.add(rule2BundleReportStrokeColor);
+        rule2.putParcelableArrayList("actions",rule2Actions);
+
+        ArrayList<Bundle> reportDataRuleList = new ArrayList<>();
+        reportDataRuleList.add(rule1);
+        reportDataRuleList.add(rule2);
+        /*##### Report data for rule End #####*/
+
+        Bundle ruleBundleReportData = new Bundle();
+        ruleBundleReportData.putString("rule_param_id","report_data");
+        ruleBundleReportData.putParcelableArrayList("rule_list", reportDataRuleList);
+
+        ArrayList<Bundle> ruleParamList = new ArrayList<>();
+        ruleParamList.add(ruleBundleReportData);
+        /*##### Rules configuration end #####*/
+
+        paramList.putParcelableArrayList("rules", ruleParamList);
+
+        i.putExtra("PARAM_LIST", paramList);
+
+        sendBroadcast(i);
+    }
+
+
     private void switchToRegularScan()
     {
         //Specify the DataWedge action and SWITCH_DATACAPTURE API parameters
@@ -375,6 +585,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             try {
                 String action = intent.getAction();
+                setStatus("OnBroadcastReceived, Action: " + action);
                 Bundle extras = intent.getExtras();
 
                 if (intent.hasExtra(IntentKeys.EXTRA_RESULT_GET_PROFILES_LIST)){
@@ -560,6 +771,7 @@ public class MainActivity extends AppCompatActivity {
     private void setStatus(final String lineToAdd)
     {
         statusString += lineToAdd + "\n";
+        Log.d(TAG, lineToAdd);
         updateAndScrollDownTextView();
     }
 
