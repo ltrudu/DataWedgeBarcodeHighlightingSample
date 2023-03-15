@@ -319,9 +319,9 @@ public class MainActivity extends AppCompatActivity {
         bundleIgnoreCase.putString("criteria_value","true");
 
         //Create a barcode highlighting Rule 1 [Start]
-        Bundle rule1 = new Bundle();
-        rule1.putString("rule_name", "Rule1");
-        Bundle rule1Criteria = new Bundle();
+        Bundle ruleHighlightData = new Bundle();
+        ruleHighlightData.putString("rule_name", "Rule1");
+        Bundle ruleHighlightDataCriteria = new Bundle();
 
         //Set the criteria/condition. Specify the contains parameter.
         Bundle bundleContains1 = new Bundle();
@@ -340,10 +340,10 @@ public class MainActivity extends AppCompatActivity {
         identifierParamList.add(bundleIgnoreCase);
 
         //Add the parameters of "identifier" group as a ParcelableArrayList to criteria list
-        rule1Criteria.putParcelableArrayList("identifier", identifierParamList);
+        ruleHighlightDataCriteria.putParcelableArrayList("identifier", identifierParamList);
 
         //Add the criteria to Rule bundle
-        rule1.putBundle("criteria", rule1Criteria);
+        ruleHighlightData.putBundle("criteria", ruleHighlightDataCriteria);
 
         //Set up the action bundle by specifying the color to be highlight
         Bundle bundleFillColor = new Bundle();
@@ -351,15 +351,15 @@ public class MainActivity extends AppCompatActivity {
         //bundleFillColor.putString("action_value", "#CEF04E6E");
         bundleFillColor.putString("action_value", "#CEFF0000");
 
-        ArrayList<Bundle> rule1Actions = new ArrayList<>();
-        rule1Actions.add(bundleFillColor);
-        rule1.putParcelableArrayList("actions", rule1Actions);
+        ArrayList<Bundle> ruleHighlightDataActions = new ArrayList<>();
+        ruleHighlightDataActions.add(bundleFillColor);
+        ruleHighlightData.putParcelableArrayList("actions", ruleHighlightDataActions);
         //Create a barcode highlighting Rule 1 [Finish]
 
         //Create a barcode highlighting Rule 2 [Start]
-        Bundle rule2 = new Bundle();
-        rule2.putString("rule_name", "Rule2");
-        Bundle rule2Criteria = new Bundle();
+        Bundle ruleReportData = new Bundle();
+        ruleReportData.putString("rule_name", "Rule2");
+        Bundle ruleReportDataCriteria = new Bundle();
 
         Bundle bundleContains2 = new Bundle();
         bundleContains2.putString("criteria_key", "contains");
@@ -373,16 +373,16 @@ public class MainActivity extends AppCompatActivity {
         identifierParamList2.add(bundleContains2);
         identifierParamList2.add(bundleIgnoreCase);
 
-        rule2Criteria.putParcelableArrayList("identifier", identifierParamList2);
+        ruleReportDataCriteria.putParcelableArrayList("identifier", identifierParamList2);
 
-        rule2.putBundle("criteria", rule2Criteria);
-        Bundle rule2BundleStrokeColor = new Bundle();
-        rule2BundleStrokeColor.putString("action_key", "fillcolor");
-        //rule2BundleStrokeColor.putString("action_value", "#CE7F2714");
-        rule2BundleStrokeColor.putString("action_value", "#CE00FF00");
-        ArrayList<Bundle> rule2Actions = new ArrayList<>();
-        rule2Actions.add(rule2BundleStrokeColor);
-        rule2.putParcelableArrayList("actions", rule2Actions);
+        ruleReportData.putBundle("criteria", ruleReportDataCriteria);
+        Bundle ruleReportDataBundleStrokeColor = new Bundle();
+        ruleReportDataBundleStrokeColor.putString("action_key", "fillcolor");
+        //ruleReportDataBundleStrokeColor.putString("action_value", "#CE7F2714");
+        ruleReportDataBundleStrokeColor.putString("action_value", "#CEFFFF00");
+        ArrayList<Bundle> ruleReportDataActions = new ArrayList<>();
+        ruleReportDataActions.add(ruleReportDataBundleStrokeColor);
+        ruleReportData.putParcelableArrayList("actions", ruleReportDataActions);
         //Create a barcode highlighting Rule 2 [Finish]
 
         //Create a barcode highlighting Rule 3 [Start]
@@ -415,8 +415,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Add the two created rules to the rule list
         ArrayList<Bundle> ruleList = new ArrayList<>();
-        ruleList.add(rule1);
-        ruleList.add(rule2);
+        ruleList.add(ruleHighlightData);
+        ruleList.add(ruleReportData);
         ruleList.add(rule3);
 
 
@@ -462,92 +462,108 @@ public class MainActivity extends AppCompatActivity {
         //Enable barcode highlighting
         paramList.putString("barcode_highlighting_enabled", "true");
 
+
         //Create a barcode highlighting Rule 1 [Start]
-        Bundle rule1 = new Bundle();
-        rule1.putString("rule_name", "Rule1");
-        Bundle rule1Criteria = new Bundle();
+        Bundle ruleHighlightData = new Bundle();
+        ruleHighlightData.putString("rule_name", "Rule1");
+        Bundle ruleHighlightDataCriteria = new Bundle();
 
         //Set the criteria/condition. Specify the contains parameter.
         Bundle bundleContains1 = new Bundle();
         bundleContains1.putString("criteria_key", "contains");
         bundleContains1.putString("criteria_value", contains);
 
-        Bundle rule1BundleIgnoreCase = new Bundle();
-        rule1BundleIgnoreCase.putString("criteria_key","ignore_case");
-        rule1BundleIgnoreCase.putString("criteria_value","false");
+        Bundle ruleHighlightDataBundleIgnoreCase = new Bundle();
+        ruleHighlightDataBundleIgnoreCase.putString("criteria_key","ignore_case");
+        ruleHighlightDataBundleIgnoreCase.putString("criteria_value","true");
 
         //Container is just one parameter of identifier group.
         // There are other params such as ignore case, min length, max length
         ArrayList identifierParamList = new ArrayList<>();
-        identifierParamList.add(rule1BundleIgnoreCase);
         identifierParamList.add(bundleContains1);
+        identifierParamList.add(ruleHighlightDataBundleIgnoreCase);
 
 
         //Add the parameters of "identifier" group as a ParcelableArrayList to criteria list
-        rule1Criteria.putParcelableArrayList("identifier", identifierParamList);
+        ruleHighlightDataCriteria.putParcelableArrayList("identifier", identifierParamList);
+        ruleHighlightDataCriteria.putStringArray("symbology",new String[]{sSelectedSymbology});
 
         //Add the criteria to Rule bundle
-        rule1.putBundle("criteria", rule1Criteria);
+        ruleHighlightData.putBundle("criteria", ruleHighlightDataCriteria);
 
         //Set up the action bundle by specifying the color to be highlight
         Bundle bundleFillColor = new Bundle();
         bundleFillColor.putString("action_key", "fillcolor");
-        bundleFillColor.putString("action_value", "#CEF04E6E");
+        bundleFillColor.putString("action_value", "#CEFF0000");
 
-        ArrayList rule1Actions = new ArrayList<>();
-        rule1Actions.add(bundleFillColor);
-        rule1.putParcelableArrayList("actions", rule1Actions);
+        ArrayList ruleHighlightDataActions = new ArrayList<>();
+        ruleHighlightDataActions.add(bundleFillColor);
+        ruleHighlightData.putParcelableArrayList("actions", ruleHighlightDataActions);
         //Create a barcode highlighting Rule 1 [Finish]
+
+        ArrayList<Bundle> highlightDataRuleList = new ArrayList<>();
+        highlightDataRuleList.add(ruleHighlightData);
+        //reportDataRuleList.add(ruleHighlightData);
+
+
+        //Assign the rule list to barcode_overlay parameter
+        Bundle ruleBundlebarcodeOverlay = new Bundle();
+        ruleBundlebarcodeOverlay.putString("rule_param_id", "barcode_overlay");
+        ruleBundlebarcodeOverlay.putParcelableArrayList("rule_list", highlightDataRuleList);
 
         /**
          * report data
          */
         /*##### Report data for rule Start #####*/
-        Bundle rule2 = new Bundle();
-        rule2.putString("rule_name","Rule2");
-        Bundle rule2Criteria = new Bundle();
+        Bundle ruleReportData = new Bundle();
+        ruleReportData.putString("rule_name","Rule2");
+        Bundle ruleReportDataCriteria = new Bundle();
 
-        Bundle rule2BundleContains = new Bundle();
-        rule2BundleContains.putString("criteria_key","contains");
-        rule2BundleContains.putString("criteria_value",contains);
+        Bundle ruleReportDataBundleContains = new Bundle();
+        ruleReportDataBundleContains.putString("criteria_key","contains");
+        ruleReportDataBundleContains.putString("criteria_value",contains);
 
-        Bundle rule2BundleIgnoreCase = new Bundle();
-        rule2BundleIgnoreCase.putString("criteria_key","ignore_case");
-        rule2BundleIgnoreCase.putString("criteria_value","false");
+        Bundle ruleReportDataBundleIgnoreCase = new Bundle();
+        ruleReportDataBundleIgnoreCase.putString("criteria_key","ignore_case");
+        ruleReportDataBundleIgnoreCase.putString("criteria_value","true");
 
-        ArrayList<Bundle> rule2IdentifierParamList = new ArrayList<>();
-        rule2IdentifierParamList.add(rule2BundleIgnoreCase);
-        rule2IdentifierParamList.add(rule2BundleContains);
+        ArrayList<Bundle> ruleReportDataIdentifierParamList = new ArrayList<>();
+        ruleReportDataIdentifierParamList.add(ruleReportDataBundleContains);
+        ruleReportDataIdentifierParamList.add(ruleReportDataBundleIgnoreCase);
 
-        rule2Criteria.putParcelableArrayList("identifier",rule2IdentifierParamList);
-        rule2Criteria.putStringArray("symbology",new String[]{sSelectedSymbology});
-        rule2.putBundle("criteria",rule2Criteria);
+        ruleReportDataCriteria.putParcelableArrayList("identifier",ruleReportDataIdentifierParamList);
+        ruleReportDataCriteria.putStringArray("symbology",new String[]{sSelectedSymbology});
+        ruleReportData.putBundle("criteria",ruleReportDataCriteria);
 
-        Bundle rule2BundleReport = new Bundle();
-        rule2BundleReport.putString("action_key","report");
+        Bundle ruleReportDataBundleReport = new Bundle();
+        ruleReportDataBundleReport.putString("action_key","report");
 
-        Bundle rule2BundleReportStrokeColor = new Bundle();
-        rule2BundleReportStrokeColor.putString("action_key", "fillcolor");
+        /*
+        Bundle ruleReportDataBundleReportStrokeColor = new Bundle();
+        ruleReportDataBundleReportStrokeColor.putString("action_key", "fillcolor");
         String color = et_color.getText().toString();
         if(color.isEmpty())
             color = "#CE00FF00";
-        rule2BundleReportStrokeColor.putString("action_value", color);
+        ruleReportDataBundleReportStrokeColor.putString("action_value", color);
+        */
 
-        ArrayList<Bundle> rule2Actions = new ArrayList<>();
-        rule2Actions.add(rule2BundleReport);
-        //rule2Actions.add(rule2BundleReportStrokeColor);
-        rule2.putParcelableArrayList("actions",rule2Actions);
+        ArrayList<Bundle> ruleReportDataActions = new ArrayList<>();
+        ruleReportDataActions.add(ruleReportDataBundleReport);
+        //ruleReportDataActions.add(ruleReportDataBundleReportStrokeColor);
+        ruleReportData.putParcelableArrayList("actions",ruleReportDataActions);
 
         ArrayList<Bundle> reportDataRuleList = new ArrayList<>();
-        reportDataRuleList.add(rule1);
-        reportDataRuleList.add(rule2);
-        /*##### Report data for rule End #####*/
+        reportDataRuleList.add(ruleReportData);
+        //reportDataRuleList.add(ruleHighlightData);
 
         Bundle ruleBundleReportData = new Bundle();
         ruleBundleReportData.putString("rule_param_id","report_data");
         ruleBundleReportData.putParcelableArrayList("rule_list", reportDataRuleList);
 
+        /*##### Report data for rule End #####*/
+
         ArrayList<Bundle> ruleParamList = new ArrayList<>();
+        ruleParamList.add(ruleBundlebarcodeOverlay);
         ruleParamList.add(ruleBundleReportData);
         /*##### Rules configuration end #####*/
 
@@ -595,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
                     if(profileList.contains(IntentKeys.PROFILE_NAME)){
                         //if the profile is already exist
                         setStatus("Profile already exists, not creating the profile");
-                        switchToRegularScan();
+                        //switchToRegularScan();
                     }else{
                         //if the profile doest exist
                         setStatus("Profile does not exists. Creating the profile..");
@@ -672,9 +688,14 @@ public class MainActivity extends AppCompatActivity {
                                     // the string was empty so let's set it to "Unknown"
                                     sLabelType = "Unknown";
                                 }
-                                setStatus("Receiving data from " + source + " :");
-                                setStatus("Type: " + sLabelType);
-                                setStatus("Value: " + data);
+                                setStatus("------- Scan Received ---------");
+                                if(source != null && source.isEmpty() == false)
+                                    setStatus("Source: " + source);
+                                if(sLabelType != null && sLabelType.isEmpty() == false && sLabelType.equalsIgnoreCase("unknown") == false)
+                                    setStatus("Type: " + sLabelType);
+                                if(data != null && data.isEmpty() == false)
+                                    setStatus("Value: " + data);
+                                setStatus("-------------------------------");
                             }
                             else {
                                 String dataToDecode = intent.getStringExtra(IntentKeys.DECODE_DATA);
